@@ -14,6 +14,7 @@ from menu.models import Item, ItemVariant
 from inventory.models import ItemRecipe, Ingredient, StockMovement
 from accounts.permissions import HasPermission, TenantScopePermission
 from .serializers import OrderSerializer, TableSerializer, ZoneSerializer, TableSessionSerializer, PaymentSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 class TableSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny] # We handle auth manually via QR/Token
@@ -123,6 +124,8 @@ class ZoneViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [TenantScopePermission]
     serializer_class = OrderSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['table', 'status']
 
     def get_queryset(self):
         return Order.objects.filter(restaurant=self.request.tenant).order_by('-id')
